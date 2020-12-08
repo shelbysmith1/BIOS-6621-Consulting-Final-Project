@@ -1,0 +1,26 @@
+---
+title: "Project Name - Analysis"
+author: "Shelby Smith"
+date: "12/8/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+data <- read.csv('final_exam_data.csv')
+head(data)
+```
+
+## Outline
+
+# Power Calculation
+After Office Hours on Friday, we can use the Confidence Interval given in the paper to reverse engineer a standard deviation estimate for our power calculation
+- Similar to HW 12, but not quite as complicated since we've been given this confidence interval, and don't have to just work off of a p-value
+
+# EDA of Preliminary Data
+
+# Correlation of Sodium Intake & Systolic Blood Pressure -- is it actually correlated?
