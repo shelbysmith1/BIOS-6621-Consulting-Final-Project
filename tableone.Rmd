@@ -1,0 +1,46 @@
+---
+title: "BIOS 6621 -- Final Project"
+author: "Sierra Niemiec"
+date: "12/11/2020"
+output: html_document
+---
+
+```{r libraries}
+library(tidyverse)
+library(arsenal)
+library(kableExtra)
+```
+
+```{r data}
+preliminary <- read.csv("./final_exam_data.csv")
+preliminary <- preliminary %>% select(ID, SBP0, SBP1, sex, age, naprox) %>% mutate(bp_diff = SBP0 - SBP1) %>% filter(SBP1 > 40 & SBP1 < 240) %>% filter(SBP1 > 40 & SBP1 < 240)
+```
+
+
+```{r tableone, results="asis"}
+tbl_controls <- tableby.control(test = F, numeric.simplify = T, digits = 2, numeric.stats = c("meansd", "medianq1q3", "range", "Nmiss2"), cat.stats = c("countpct", "Nmiss2"), digits.count = 0, digits.pct = 1, stats.labels = list(meansd = "Mean (SD)", medianq1q3 = "Median (Q1, Q3)", range = "Min - Max", Nmiss2 = "Missing"))
+
+tbl_labels <- list(
+  SBP0 = "Systolic BP (Baseline)",
+  SBP1 = "Systolic BP (4 Months)",
+  bp_diff = "Systolic BP Change (Basline - 4 Months)",
+  naprox = "Sodium Intake Proxy",
+  sex = "Sex",
+  age = "Age (years)"
+)
+
+tableone <- tableby( ~ SBP0 + SBP1 + bp_diff + naprox + sex + age, preliminary, control = tbl_controls)
+
+summary(tableone,
+  labelTranslations = tbl_labels,
+  title = "Table 1. Descriptive Summary of Preliminary Data")
+```
+
+Remarks:
+
+The original preliminary data had 315 subjects, but after removing 30 with missing data and 2 with exceedingly extreme values at the 4-month systolic BP measure, a total of 283 subjects remained. Summary statistics of the preliminary did show some differences between this data and that of the reference data, leading to population differences which may impact assumptions of the power analysis (Table 1). Notably, the ratio of men/women of the preliminary and reference data was quite different; about 2/3 of the reference data were men (66.9%) whereas in preliminary data, 82.2% of the subjects were women. The mean age of the preliminary data was about 10 years older than that of the reference data. The baseline systolic BP was also different; 147 (sd: 13) for the reference data and 154 (sd: 8.3). Furthermore, the inclusion criteria for each study differed. The reference included subjects with a systolic BP between 140 to 170 mmgHg or diastolic between 90 to 105 mmHg. However, the preliminary data had a tighter range of 140-159 mmHg systolic and/or 90-99 mmHg diastolic. Again, these differences between the populations ought to be noted as they could impact the assumptions of the power analysis.
+
+
+Analysis Plan:
+
+To assess if this behavioral intervention has an effect on systolic blood pressure over 4 months, a one-sample, two-sided t-test of the mean change between baseline and the 4-month follow-up will be calculated, comparing the difference to a null of 0. The significance level will be set to 5% and either direction of change will be tested.
