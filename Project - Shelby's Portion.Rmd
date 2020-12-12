@@ -1,0 +1,99 @@
+---
+title: "Consulting Final Project - Shelby's Document"
+author: "Shelby Smith"
+date: "12/11/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+setwd("~/Documents/Academic/University of Colorado/BIOS 6621 - Consulting I/BIOS-6621-Consulting-Final-Project/")
+data <- read.csv("final_exam_data.csv", header=TRUE)
+```
+
+```{r}
+head(data)
+
+data2 <- data %>%
+  mutate(SBP_Diff = data$SBP1 - data$SBP0)
+
+head(data2)
+```
+
+```{r}
+favstats(data$SBP0)
+ggplot(data2, aes(x = SBP0)) +
+  geom_histogram()
+```
+
+
+```{r}
+favstats(data$SBP1) # 30 individuals are missing SBP1 data
+ggplot(data2, aes(x = SBP1)) + 
+  geom_histogram()
+```
+
+```{r}
+favstats(data2$SBP_Diff)
+```
+
+```{r}
+ggplot(data2, aes(x = SBP_Diff)) +
+  geom_histogram()
+```
+
+```{r}
+#Removing the extraordinary values
+data3 <- data2[-c(246,83),]
+favstats(data3$SBP_Diff)
+```
+
+```{r, warning = FALSE}
+library(ggpubr)
+legend_title <- "Measurement Time Points"
+ggplot(data3) +
+  geom_density(aes(x = SBP0), color = 'orchid', alpha = 0.4, rug = FALSE) +
+  geom_density(aes(x = SBP1), color = "slategrey", alpha = 0.4, rug = FALSE) +
+  labs(x = 'Systolic Blood Pressure', y = 'Density') + 
+  scale_fill_manual(legend_title, values=c("orchid","slategrey"))
+```
+
+```{r, warning = FALSE}
+ggdensity(data3, 
+          x = c('SBP1','SBP0', 'SBP3'),
+          y = "..density..",
+          add = 'mean', 
+          merge = TRUE, 
+          color = ".x.", fill = ".x.", show.legend = FALSE) +
+  labs(x = 'Systolic Blood Pressure', y = 'Density', title = 'Distribution of Systolic Blood Pressure at 3 Different Time Points', subtitle = 'No Intervention') + 
+  scale_fill_discrete(name = 'Measurement Time Points', labels = c('After 4 Weeks', 'Baseline', 'After 12 Weeks')) +
+  guides(color = FALSE) + 
+  theme(legend.position = 'bottom')
+```
+
+```{r}
+#Standard Deviation from the Reference Paper
+sample_mean <- -4.1
+z <- 1.96
+n <- 169
+sqrt(n)
+LL <- -5.2
+UL <- -3.0
+s <- sqrt(n)*((LL - sample_mean)/(-z))
+s
+```
+
+```{r}
+#Power Calculation Using Reference Paper SD Estimate
+power.t.test(n = NULL, sd = 7.295918, power = 0.90, delta = 5, sig.level = 0.05, type = 'one.sample', alternative = 'two.sided')
+
+```
+
+```{r}
+#Sample Size Calculation using Preliminary Data SD 
+power.t.test(n = NULL, sd = 8.25, power = 0.90, delta = 12, sig.level = 0.05,type = 'one.sample', alternative = 'two.sided' )
+```
+
