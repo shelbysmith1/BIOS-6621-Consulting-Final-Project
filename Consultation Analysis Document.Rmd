@@ -1,9 +1,11 @@
 ---
 title: "Project Name - Analysis"
-author: "Shelby Smith"
-date: "12/8/2020"
+author: "Graber, C., Niemiec, S., and Smith, S."
+date: "December 15, 2020"
 output: 
   html_document:
+    toc: true
+    toc_float: true
     theme: lumen
 ---
 
@@ -11,71 +13,25 @@ output:
 knitr::opts_chunk$set(echo = TRUE, fig.align = 'center')
 library(tidyverse)
 library(ggpubr)
-#install.packages('arsenal')
 library(arsenal)
 library(kableExtra)
 library(mosaic)
 library(table1)
 ```
 
-```{r, include = FALSE}
+
+```{r, include= FALSE}
 data <- read.csv("final_exam_data.csv", header=TRUE)
 
-# Creating the New Difference Variable Comparing 4 Weeks to Baseline
 data2 <- data %>%
   mutate(SBP_Diff = data$SBP1 - data$SBP0)
-```
 
-```{r, include = FALSE}
-favstats(data$SBP0)
-ggplot(data2, aes(x = SBP0)) +
-  geom_histogram()
-```
-
-```{r, include = FALSE}
-favstats(data$SBP1) # 30 individuals are missing SBP1 data
-ggplot(data2, aes(x = SBP1)) + 
-  geom_histogram()
-# 30 individuals missing SBP1 Data + 2 Potential Outliers
-# Confirmed Outliers with PI 12/10 - SJS
-```
-
-```{r, include = FALSE}
-favstats(data2$SBP_Diff)
-ggplot(data2, aes(x = SBP_Diff)) +
-  geom_histogram()
-# Difference Plot Confirming Outliers in SBP1
-```
-
-```{r, include = FALSE}
-#Removing the Outlier Values
 data3 <- data2[-c(246,83),]
-favstats(data3$SBP_Diff)
-
-count(complete.cases(data3))
 ```
-
 
 ## Sample Size Calculations
 
 Using the Reference Paper, *Effect of Modest Salt Reduction on Blood Pressure, Urinary Albumin, and Pulse Wave Velocity in White, Black, and Asian Mild Hypertensives* by He, et al, we were able to structure our sample size calculation based on a sample standard deviation estimate from this study. In the previous study, a 95% Confidence Interval was reported for the mean difference in Ambulatory 24-Hour Systolic Blood Pressure (in mmHg) with a sample mean of -4.1 mmHg (95% CI: -5.2 to -3.0). The Ambulatory 24-hour SBP was measured by the use of SpaceLabs 90207 devices, and the 95% confidence interval represents the difference in Systolic Blood Pressure for the Slow Sodium group and the Placebo group. Using this Confidence Interval, and the complete cases Sample Size of 169 participants, we were able to calculate a Standard Deviation estimate of 7.296. 
-
-```{r, include = FALSE}
-#Standard Deviation Calculating Using Information from the Reference Paper
-sample_mean <- -4.1
-z <- 1.96
-n <- 169
-LL <- -5.2
-UL <- -3.0
-s <- sqrt(n)*((LL - sample_mean)/(-z))
-s
-```
-
-
-```{r, include = FALSE}
-#Power Calculation Using Reference Paper SD Estimate
-power.t.test(n = NULL, sd = 7.295918, power = 0.90, delta = 5, sig.level = 0.05, type = 'one.sample', alternative = 'two.sided')
-```
 
 Using this sample standard deviation, and the following assumptions:
 
@@ -86,11 +42,6 @@ Using this sample standard deviation, and the following assumptions:
   
 we were able to obtain a necessary sample size estimate of 24.37 participants. This suggests that in order to achieve at least 90% power for this study, the investigator would need to enroll at least 25 individuals. 
 
-```{r, include = FALSE}
-#Sample Size Calculation using Preliminary Data SD 
-power.t.test(n = NULL, sd = 8.25, power = 0.90, delta = 5, sig.level = 0.05,type = 'one.sample', alternative = 'two.sided' )
-```
-
 A question was also asked if we could base our Sample Size calculation on the preliminary data. In doing so, we would be using a much more conservative standard deviation of 8.25 from our calculated difference in the Baseline Systolic Blood Pressure and the Systolic Blood Pressure of individuals 4 weeks later. Using this standard deviation estimate, the investigator would need to enroll at least 31 individuals to obatin at least 90% power in this study. With that said, the Reference Paper study design allows us to calculate a standard deviation estimate in the setting of observed change with intervention. Using the preliminary data, in which case no intervention was seen, the standard deviation estimate is calculated from a difference that we would actually expect to be 0 (participant Blood Pressure should be relatively stable with no intervention). So, we would recommend implementing the Sample Size calculation built from the standard deviation estimate from the Reference Paper.
 
 In calculating Sample Size, we also need to consider the potential drop out rate. With the Investigator mentioning a drop-out rate of up to 10%, it is recommended that the study enroll at least 28 individuals to the study, to maintain the desired power even with potential drop-out. 
@@ -99,13 +50,13 @@ In calculating Sample Size, we also need to consider the potential drop out rate
 
 ## Summary of Preliminary Data
 
-*Note: There were two Participants (83 and 246) who had Outliers/ Impossible Measurements for Systolic Blood Pressure recorded in the data. These individuals were removed prior to the following analyses. The impossibility of the values were confirmed with the Primary Investigator on 12/11 via Email. *
+*Note: There were two Participants (83 and 246) who had Outliers/ Impossible Measurements for Systolic Blood Pressure recorded in the data. These individuals were removed prior to the following analyses. The impossibility of the values were confirmed with the Primary Investigator on 12/11 via Email.*
 
 The following table also provides summary statistics for each of the variables contained in the Preliminary Data. To highlight a few key elements:
 
   - There were were a total of 313 Participants analyzed from the Preliminary Data (159 with Complete Data)
-  - 30 individuals are missing data for 24-Hour Mean SBP at 4 Weeks after Baseline
-  - 150 individuals are missing data for 24-Hour Mean SBP at 12 Weeks after Baseline
+  - 30 individuals are missing data for 24-Hour Mean SBP at **4 Weeks** after Baseline
+  - 150 individuals are missing data for 24-Hour Mean SBP at **12 Weeks** after Baseline
   - 82.1% of those enrolled in the study were Women
   - The mean age for all participants was 60.4 years (SD = 10.8 years)
 
@@ -122,6 +73,20 @@ label(data3$naprox) <- 'NA Intake Proxy Variable'
 table1(~ SBP0 + SBP1 + SBP3 + SBP_Diff + sex + age + naprox, data=data3, overall = 'Total Enrolled', topclass="Rtable1-grid Rtable1-shade Rtable1-times", transpose = FALSE)
 ```
 
+It is also important to note, that summary statistics of the preliminary demonstrate some important differences compared to the reference paper for which this study is based upon. These population differences may impact assumptions of the power analysis (Table 1). Notable differences are as follows: 
+
+- The ratio of men/women of the preliminary and reference data is quite different
+  -  ~ 2/3 of the reference data were men (66.9%) whereas in preliminary data, 82.2% of the subjects were women 
+- The mean age of the preliminary data is about 10 years older than that of the reference data
+- The baseline systolic BP is different
+  - A mean of 147 mmHg (SD: 13) was observed in the reference data
+  - A mean of 154 mmHg (sd: 8.3) was observed in the preliminary data 
+- Furthermore, there were basic differences in the inclusion criteria for the two studies: 
+  - The reference data included subjects with a systolic BP between 140 to 170 mmgHg or diastolic between 90 to 105 mmHg 
+  - The preliminary data had a tighter range of 140-159 mmHg systolic and/or 90-99 mmHg diastolic
+  
+Again, these differences between the populations ought to be mentioned as they could impact the assumptions of the power analysis.
+
 ---
 
 The following plot describes the distribution of mean Systolic Blood Pressure Measurements at the 3 time points we have in the Preliminary Data. Without an intervention implemented, it is expected that participant blood pressure remains relatively constant. By the significant overlap between the 3 conditions, I would say Systolic Blood Pressure is relatively consistent across the 12 weeks. 
@@ -136,38 +101,18 @@ ggdensity(data3,
   labs(x = 'Systolic Blood Pressure', y = 'Density', title = 'Distribution of Systolic BP at Baseline, 4 Weeks & 12 Weeks', subtitle = 'No Intervention', caption  = 'A total of 180 missing data points have been ommitted') + 
   scale_fill_discrete(name = 'Measurement Time Points', labels = c('After 4 Weeks', 'Baseline', 'After 12 Weeks')) +
   guides(color = FALSE) + 
-  theme(legend.position = 'bottom')
+  theme_minimal() +
+  theme(legend.position = 'bottom') 
 ```
 
-```{r tableone, results="asis", include = FALSE}
-tbl_controls <- tableby.control(test = F, numeric.simplify = T, digits = 2, numeric.stats = c("meansd", "medianq1q3", "range", "Nmiss2"), cat.stats = c("countpct", "Nmiss2"), digits.count = 0, digits.pct = 1, stats.labels = list(meansd = "Mean (SD)", medianq1q3 = "Median (Q1, Q3)", range = "Min - Max", Nmiss2 = "Missing"))
 
-tbl_labels <- list(
-  SBP0 = "Systolic BP (Baseline)",
-  SBP1 = "Systolic BP (4 Months)",
-  bp_diff = "Systolic BP Change (Basline - 4 Months)",
-  naprox = "Sodium Intake Proxy",
-  sex = "Sex",
-  age = "Age (years)"
-)
-
-tableone <- tableby( ~ SBP0 + SBP1 + SBP_Diff + naprox + sex + age, data3, control = tbl_controls)
-
-summary(tableone,
-  labelTranslations = tbl_labels,
-  title = "Table 1. Descriptive Summary of Preliminary Data")
+```{r, include = FALSE}
+t.test(data3$SBP0, data3$SBP1, paired = TRUE)
 ```
 
 ---
 
 ## Sodium Intake and Baseline Systolic Blood Pressure 
-```{r, include = FALSE}
-#Building the Linear Regression model
-SBP.lm <- lm(SBP0 ~ naprox, data = data3)
-summary(SBP.lm)
-
-confint(SBP.lm, 'naprox', level=0.95)
-```
 
 ```{r, message = FALSE, echo = FALSE}
 ggplot(data3, aes(x = naprox, y = SBP0)) +
@@ -183,24 +128,147 @@ ggplot(data3, aes(x = naprox, y = SBP0)) +
   theme_minimal()
 ```
 
-Looking at the relationship between an individual's Baseline Systolic Blood Pressure and their Sodium Intake Proxy Variable, there is a slight, positive relationship (R = 0.1133024, 95% CI: (0.0025, 0.2214)) between the amount of Sodium an individual consumes, and their Baseline mean 24-Hour Systolic Blood Pressure. Additionally, looking at the linear model itself, we can see that for every one unit increase in the Sodium Proxy Variable, an individual's Baseline SBP increases, on average, by 0.1037 (p = 0.0452, 95% CI: (0.0022, 0.2051). Because this interval does not contain 0, and p < 0.05, we would conclude this is a significant linear relationship between Sodium Intake and Baseline Systolic Blood Pressure. Finally, 11.3% of the variability in an individual's Systolic Blood Pressure can be explained by their Sodium Intake. While this may seem small, our analysis suggests this is a significant predictor of Systolic Blood Pressure. 
+Looking at the relationship between an individual's Baseline Systolic Blood Pressure and their Sodium Intake Proxy Variable, there is a slight, positive relationship (R = 0.1133024, 95% CI: (0.0025, 0.2214)) between the amount of Sodium an individual consumes, and their Baseline mean 24-Hour Systolic Blood Pressure. Additionally, looking at the linear model itself, we can see that for every one unit increase in the Sodium Proxy Variable, an individual's Baseline SBP increases, on average, by 0.1037 (p = 0.0452, 95% CI: (0.0022, 0.2051). Because this interval does not contain 0, and p < 0.05, we would conclude there is a moderately significant linear relationship between Sodium Intake and Baseline Systolic Blood Pressure. Finally, only 1.3% of the variability in an individual's Systolic Blood Pressure can be explained by their Sodium Intake. While this may seem small, our analysis suggests this is a significant predictor of Systolic Blood Pressure. 
 
-```{r, include = FALSE}
-rsq <- function (x, y) cor(x, y) ^ 2
-rsq(data3$SBP0, data3$naprox)
-# R^2 = 0.01279,  Adj R^2 = 0.009636
-
-```
-
-
-```{r, include = FALSE}
-#Why not just use the cor function?
-#cor(data3$SBP0, data3$naprox)
-cor.test(data3$SBP0, data3$naprox)
-```
+With knowledge from the Primary Investigator that the Sodium Proxy Variable in this study is only a rough estimate of an individual's actual Sodium Intake, it should be noted that with more detailed information or data collected regarding participant Sodium consumption, the association between these two variables may be clearer. We can see from the scatter plot there is not a drastic association between the two variables, despite the associated statistical significance.
 
 ---
-
 ## Analysis Plan Recommendations 
 
 In order to assess if the designed behavioral intervention applet has an effect on Systolic Blood Pressure after 4 weeks, we believe a one-sample, two-sided t-test will be able to analyze this difference. The measurement of interest is the change in 24-Hour Mean Systolic Blood Pressure measurements of individuals from Baseline to 4 weeks (same as the preliminary data), and in order to analyze the mean change, the results should be compared to a null difference of 0 (suggesting the intervention did not have any effect on an individual's Systolic Blood Pressure). With a significance level set to $\alpha = 0.05$, a two-sided analysis can be performed to investigate any change at all in participant blood pressure without specification of directionality.
+
+---
+## Appendix
+
+**Data Wrangling**
+
+```{r, eval = FALSE}
+#Reading in the Data
+data <- read.csv("final_exam_data.csv", header=TRUE)
+
+# Creating the New Difference Variable Comparing 4 Weeks to Baseline
+data2 <- data %>%
+  mutate(SBP_Diff = data$SBP1 - data$SBP0)
+```
+
+```{r, eval = FALSE}
+# Analyzing the Baseline SBP Measurements
+
+favstats(data2$SBP0)
+ggplot(data2, aes(x = SBP0)) +
+  geom_histogram()
+```
+
+```{r, eval = FALSE}
+# Analyzing the SBP Measurements after 4 weeks 
+
+favstats(data2$SBP1) 
+# 30 individuals are missing SBP1 data
+
+ggplot(data2, aes(x = SBP1)) + 
+  geom_histogram()
+# 30 individuals missing SBP1 Data + 2 Potential Outliers, Confirmed Outliers with PI 12/10 - SJS
+```
+
+```{r, eval = FALSE}
+#Removing the Outlier Values
+data3 <- data2[-c(246,83),]
+```
+
+```{r, eval = FALSE}
+# Analyzing the Difference Variable
+favstats(data3$SBP_Diff)
+ggplot(data3, aes(x = SBP_Diff)) +
+  geom_histogram()
+```
+
+```{r, eval = FALSE}
+#Counting the number of Participants with Complete Data
+count(complete.cases(data3))
+```
+
+**Sample Size Calculations / Power Analysis**
+
+```{r, eval = FALSE}
+#Standard Deviation Calculating Using Information from the Reference Paper
+sample_mean <- -4.1
+z <- 1.96
+n <- 169
+LL <- -5.2
+UL <- -3.0
+s <- sqrt(n)*((LL - sample_mean)/(-z))
+s
+```
+
+```{r, eval = FALSE}
+#Power Calculation Using Reference Paper SD Estimate
+y <- power.t.test(n = NULL, sd = 7.295918, power = 0.90, delta = 5, sig.level = 0.05, type = 'one.sample', alternative = 'two.sided')
+
+# Making Note of the ~10% Drop-out Rate
+n_1 <- y$n/(1-0.10)
+n_1
+
+# So the PI must enroll 28 participants in order to obtain at least 90% Power for this study. 
+```
+
+```{r, eval = FALSE}
+#Sample Size Calculation using Preliminary Data SD 
+z <- power.t.test(n = NULL, sd = 8.25, power = 0.90, delta = 5, sig.level = 0.05,type = 'one.sample', alternative = 'two.sided' )
+
+# Making Note of the ~10% Drop-out Rate
+n_2 <- z$n/(1-0.10)
+n_2
+
+# So, the PI must enroll 34 participants in order to obtain at least 90% power for this study
+```
+
+**Preliminary Data Analysis**
+ 
+```{r, eval = FALSE}
+#Table 1 Construction
+par(mfrow = c(1,2))
+label(data3$SBP0)       <- "SBP Baseline"
+label(data3$SBP1)       <- "SBP - 4 Weeks"
+label(data3$SBP3)     <- "SBP - 12 Weeks"
+label(data3$SBP_Diff) <- "Difference - Baseline to 4 Weeks"
+label(data3$age) <- 'Age'
+label(data3$sex) <- 'Sex'
+label(data3$naprox) <- 'NA Intake Proxy Variable'
+
+table1(~ SBP0 + SBP1 + SBP3 + SBP_Diff + sex + age + naprox, data=data3, overall = 'Total Enrolled', topclass="Rtable1-grid Rtable1-shade Rtable1-times", transpose = FALSE)
+```
+
+```{r, eval = FALSE, warning = FALSE}
+# Density Plot Construction
+ggdensity(data3, 
+          x = c('SBP1','SBP0', 'SBP3'),
+          y = "..density..",
+          add = 'mean', 
+          merge = TRUE, 
+          color = ".x.", fill = ".x.", show.legend = FALSE) +
+  labs(x = 'Systolic Blood Pressure', y = 'Density', title = 'Distribution of Systolic BP at Baseline, 4 Weeks & 12 Weeks', subtitle = 'No Intervention', caption  = 'A total of 180 missing data points have been ommitted') + 
+  scale_fill_discrete(name = 'Measurement Time Points', labels = c('After 4 Weeks', 'Baseline', 'After 12 Weeks')) +
+  guides(color = FALSE) + 
+  theme(legend.position = 'bottom')
+```
+
+**Relationship between Sodium Intake & Systolic Blood Pressure**
+```{r, eval = FALSE}
+#Building the Linear Regression model
+SBP.lm <- lm(SBP0 ~ naprox, data = data3)
+summary(SBP.lm)
+
+confint(SBP.lm, 'naprox', level=0.95)
+```
+
+```{r, eval = FALSE}
+# Calculating the R^2 Value - Describing the Variability in SBP explained by Na Proxy Variable
+rsq <- function (x, y) cor(x, y) ^ 2
+rsq(data3$SBP0, data3$naprox)
+# R^2 = 0.01279,  Adj R^2 = 0.009636
+```
+
+```{r, eval = FALSE}
+# Obtaining the Correlation Coefficient
+cor.test(data3$SBP0, data3$naprox)
+```
