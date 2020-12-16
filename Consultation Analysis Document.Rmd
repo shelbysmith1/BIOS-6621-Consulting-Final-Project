@@ -148,11 +148,13 @@ Looking at the relationship between an individual's Baseline Systolic Blood Pres
 With knowledge from the Primary Investigator that the Sodium Proxy Variable in this study is only a rough estimate of an individual's actual Sodium Intake, it should be noted that with more detailed information or data collected regarding participant Sodium consumption, the association between these two variables may be clearer. We can see from the scatter plot there is not a drastic association between the two variables, despite the associated statistical significance.
 
 ---
+
 ## Analysis Plan Recommendations 
 
 In order to assess if the designed behavioral intervention applet has an effect on Systolic Blood Pressure after 4 weeks, we believe a one-sample, two-sided t-test will be able to analyze this difference. The measurement of interest is the change in 24-Hour Mean Systolic Blood Pressure measurements of individuals from Baseline to 4 weeks (same as the preliminary data), and in order to analyze the mean change, the results should be compared to a null difference of 0 (suggesting the intervention did not have any effect on an individual's Systolic Blood Pressure). With a significance level set to $\alpha = 0.05$, a two-sided analysis can be performed to investigate any change at all in participant blood pressure without specification of directionality.
 
 ---
+
 ## Appendix
 
 **Data Wrangling**
