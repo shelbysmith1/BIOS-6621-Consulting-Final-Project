@@ -1,5 +1,6 @@
 ---
-title: "Project Name - Analysis"
+title: "Hypertension & Sodium Intake Behavioral Intervention Study"
+subtitle: "Requested Analysis Following Initial Consultation"
 author: "Graber, C., Niemiec, S., and Smith, S."
 date: "December 15, 2020"
 output: 
@@ -40,11 +41,12 @@ Using this sample standard deviation, and the following assumptions:
   - Significance Level: $\alpha < 0.05$
   - Alternative Hypothesis: Two-Sided
   
-we were able to obtain a necessary sample size estimate of 24.37 participants. This suggests that in order to achieve at least 90% power for this study, the investigator would need to enroll at least 25 individuals. 
+we were able to obtain a necessary sample size estimate of 24.37 participants. This suggests that in order to achieve at least 90% power for this study, the investigator would need to enroll at least 25 individuals. Accounting for a predicted dropout of 10% suggests an ideal enrollment would actuall be a total of 28 participants. 
+A question was also asked if we could base our Sample Size calculation on the preliminary data. In doing so, we would be using a much more conservative standard deviation of 8.25 from our calculated difference in the Baseline Systolic Blood Pressure and the Systolic Blood Pressure of individuals 4 weeks later. Using this standard deviation estimate, the investigator would need to enroll at least 31 individuals to obtain at least 90% power in this study. However, accounting for anticipated drop-out of 10%, an ideal enrollment would actually be a total of 34 participants. 
 
-A question was also asked if we could base our Sample Size calculation on the preliminary data. In doing so, we would be using a much more conservative standard deviation of 8.25 from our calculated difference in the Baseline Systolic Blood Pressure and the Systolic Blood Pressure of individuals 4 weeks later. Using this standard deviation estimate, the investigator would need to enroll at least 31 individuals to obatin at least 90% power in this study. With that said, the Reference Paper study design allows us to calculate a standard deviation estimate in the setting of observed change with intervention. Using the preliminary data, in which case no intervention was seen, the standard deviation estimate is calculated from a difference that we would actually expect to be 0 (participant Blood Pressure should be relatively stable with no intervention). So, we would recommend implementing the Sample Size calculation built from the standard deviation estimate from the Reference Paper.
+With that said, the Reference Paper study design allows us to calculate a standard deviation estimate in the setting of observed change with intervention. Using the preliminary data, in which case no intervention was seen, the standard deviation estimate is calculated from a difference that we would actually expect to be 0 (participant Blood Pressure should be relatively stable with no intervention). So, we would recommend implementing the Sample Size calculation built from the standard deviation estimate from the Reference Paper. However, there are a few notable differences between the populations of the Reference Paper, and the preliminary data, which could be impacting these calculations. Further explanation of these differences can be found at the end of the *Summary of Preliminary Data* Section. 
 
-In calculating Sample Size, we also need to consider the potential drop out rate. With the Investigator mentioning a drop-out rate of up to 10%, it is recommended that the study enroll at least 28 individuals to the study, to maintain the desired power even with potential drop-out. 
+In calculating Sample Size, we also need to consider the potential drop out rate, conservatively estimated to be about 10%. If using the Standard Deviation estimate from the Reference Paper, it is recommended that the study enroll at least 28 individuals to the study, to maintain the desired power even with potential drop-out. If using the Standard Deviation estimate from the Preliminary Data, an enrollment of 34 individuals would be needed to reach the desired 90% power. 
 
 ---
 
@@ -105,6 +107,19 @@ ggdensity(data3,
   theme(legend.position = 'bottom') 
 ```
 
+
+```{r, echo = FALSE, message = FALSE}
+ggplot(data3, aes(x = naprox)) +
+  geom_histogram(aes(y = ..density..), 
+                 fill = 'thistle2',
+                 alpha = 1) +
+  geom_density(col = 4) + 
+  geom_vline(xintercept = mean(data3$naprox), col = 4, linetype = 2) + 
+  geom_text(aes(x = mean(naprox) + 4, label = 'Mean Score', y = 0.055)) + 
+  labs(title = 'Distribution of NA Proxy Variable', x = 'Survey Score', y = 'Count', subtitle = 'Note: Two Potential Outliers') + 
+  theme_minimal()
+```
+In investigating the distribution of the Sodium Proxy Variable Survey scores, it is relatively normally distributed with a mean of 26.4. There are also two extreme scores (1 and 54) that may be considered outliers, depending on the structure of the survey, and the Primary Investigator's expertise. 
 
 ```{r, include = FALSE}
 t.test(data3$SBP0, data3$SBP1, paired = TRUE)
@@ -200,7 +215,7 @@ s <- sqrt(n)*((LL - sample_mean)/(-z))
 s
 ```
 
-```{r, eval = FALSE}
+```{r}
 #Power Calculation Using Reference Paper SD Estimate
 y <- power.t.test(n = NULL, sd = 7.295918, power = 0.90, delta = 5, sig.level = 0.05, type = 'one.sample', alternative = 'two.sided')
 
@@ -211,9 +226,10 @@ n_1
 # So the PI must enroll 28 participants in order to obtain at least 90% Power for this study. 
 ```
 
-```{r, eval = FALSE}
+```{r}
 #Sample Size Calculation using Preliminary Data SD 
 z <- power.t.test(n = NULL, sd = 8.25, power = 0.90, delta = 5, sig.level = 0.05,type = 'one.sample', alternative = 'two.sided' )
+z
 
 # Making Note of the ~10% Drop-out Rate
 n_2 <- z$n/(1-0.10)
